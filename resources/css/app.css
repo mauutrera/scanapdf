@@ -1,0 +1,258 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    /* Barra de desplazamiento de la página: delgada y discreta, pero siempre visible. */
+    html {
+        scrollbar-width: thin;
+        scrollbar-color: rgb(133 149 161 / 0.35) transparent;
+    }
+    html::-webkit-scrollbar { width: 8px; height: 8px; }
+    html::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+    html::-webkit-scrollbar-track { background: transparent; }
+    html::-webkit-scrollbar-thumb { background: rgb(133 149 161 / 0.35); border-radius: 999px; }
+
+    /* Que el atributo hidden gane siempre, aunque el elemento tenga flex, grid, etc. */
+    [hidden] {
+        display: none !important;
+    }
+}
+
+@layer components {
+    /* ---------- Armazón de la app ---------- */
+    .app-body {
+        @apply min-h-screen bg-ink-50 font-sans text-ink-900 antialiased dark:bg-ink-950 dark:text-ink-100;
+        /* Zonas seguras del celular (muesca, esquinas) cuando corre como app instalada. */
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+    .skip-link {
+        @apply sr-only rounded-md bg-ink-900 px-3 py-2 text-sm text-white focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50;
+    }
+    .app-header {
+        @apply sticky top-0 z-40 border-b border-ink-200/80 bg-white/85 backdrop-blur-md dark:border-ink-800/80 dark:bg-ink-900/85;
+        padding-top: env(safe-area-inset-top);
+    }
+    .nav-link {
+        @apply inline-flex items-center gap-1.5 rounded-lg px-3 py-2 font-medium text-ink-600 transition
+            hover:bg-ink-100 hover:text-ink-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-lamp-500
+            dark:text-ink-300 dark:hover:bg-ink-800 dark:hover:text-white;
+    }
+    .nav-link[aria-current='page'] {
+        @apply bg-lamp-600 font-semibold text-white shadow-sm hover:bg-lamp-700 hover:text-white dark:hover:bg-lamp-700 dark:hover:text-white;
+    }
+    .theme-switch {
+        @apply flex items-center gap-0.5 rounded-lg bg-ink-100 p-0.5 dark:bg-ink-800;
+    }
+    .theme-option {
+        @apply flex h-7 w-7 items-center justify-center rounded-md text-ink-500 transition hover:text-ink-900
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-lamp-500 dark:text-ink-400 dark:hover:text-white;
+    }
+    .theme-option[aria-pressed='true'] {
+        @apply bg-white text-ink-900 shadow-sm dark:bg-ink-950 dark:text-white;
+    }
+    .chip-offline {
+        @apply rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800 dark:bg-amber-500/15 dark:text-amber-300;
+    }
+    .app-main {
+        @apply mx-auto max-w-6xl px-4 pb-28 pt-8 md:pb-12 md:pt-10;
+    }
+    .app-footer {
+        @apply border-t border-ink-200 py-6 text-xs text-ink-500 dark:border-ink-800 dark:text-ink-400;
+        padding-bottom: calc(1.5rem + 4.5rem + env(safe-area-inset-bottom)); /* deja libre la barra de pestañas */
+    }
+    @media (min-width: 768px) {
+        .app-footer { padding-bottom: 1.5rem; }
+    }
+    .tab-bar {
+        @apply fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-ink-200 bg-white/95 backdrop-blur-md
+            dark:border-ink-800 dark:bg-ink-900/95;
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+    .tab-link {
+        @apply flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-medium text-ink-500 transition
+            focus:outline-none focus-visible:bg-ink-100 dark:text-ink-400 dark:focus-visible:bg-ink-800;
+    }
+    .tab-link[aria-current='page'] {
+        @apply text-lamp-700 dark:text-lamp-300;
+    }
+
+    /* Aviso flotante (instalación, actualización) */
+    .app-banner {
+        @apply fixed left-1/2 z-50 flex w-[calc(100%-2rem)] max-w-md -translate-x-1/2 items-center gap-3 rounded-xl
+            bg-ink-900 px-4 py-3 text-sm text-white shadow-xl dark:bg-ink-100 dark:text-ink-900;
+        bottom: calc(5.5rem + env(safe-area-inset-bottom));
+    }
+    @media (min-width: 768px) {
+        .app-banner { bottom: 1.5rem; }
+    }
+    .app-banner > span { @apply flex-1; }
+    .app-banner-action {
+        @apply rounded-md bg-lamp-600 px-3 py-1.5 font-semibold text-white hover:bg-lamp-700;
+    }
+    .app-banner-close {
+        @apply -mr-1 rounded px-1.5 text-lg leading-none text-white/70 hover:text-white dark:text-ink-900/60 dark:hover:text-ink-900;
+    }
+
+    /* ---------- Navegación sin recarga ---------- */
+    .route-progress {
+        @apply fixed inset-x-0 top-0 z-50 h-0.5 bg-lamp-500;
+        animation: route-progress 1.2s ease-in-out infinite;
+        transform-origin: left;
+    }
+    @keyframes route-progress {
+        0% { transform: scaleX(0.05); opacity: 1; }
+        70% { transform: scaleX(0.85); opacity: 1; }
+        100% { transform: scaleX(1); opacity: 0; }
+    }
+    .view-enter {
+        animation: view-enter 0.18s ease-out;
+    }
+    @keyframes view-enter {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .view-enter, .route-progress { animation: none; }
+    }
+    [data-view] h1:focus { outline: none; }
+
+    /* ---------- Barras de desplazamiento sutiles ----------
+       Casi invisibles en reposo; se aclaran al pasar el mouse o al usar el teclado dentro del área.
+       Sin flechas y separadas del contenido para no encimarse en las esquinas redondeadas. */
+    .subtle-scroll {
+        scrollbar-width: thin;                          /* Chrome 121+, Edge, Firefox */
+        scrollbar-color: transparent transparent;
+        transition: scrollbar-color 0.2s;
+    }
+    .subtle-scroll:hover,
+    .subtle-scroll:focus-within {
+        scrollbar-color: rgb(133 149 161 / 0.35) transparent;
+    }
+    /* Safari y navegadores sin las propiedades estándar */
+    .subtle-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .subtle-scroll::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+    .subtle-scroll::-webkit-scrollbar-track { background: transparent; margin: 14px; }
+    .subtle-scroll::-webkit-scrollbar-thumb { background: transparent; border-radius: 999px; }
+    .subtle-scroll:hover::-webkit-scrollbar-thumb,
+    .subtle-scroll:focus-within::-webkit-scrollbar-thumb { background: rgb(133 149 161 / 0.35); }
+    .subtle-scroll::-webkit-scrollbar-corner { background: transparent; }
+
+    /* ---------- Inicio ---------- */
+    .hero-art {
+        @apply mx-auto w-full max-w-md;
+    }
+    .scan-line {
+        animation: scan 3.2s ease-in-out infinite alternate;
+        filter: drop-shadow(0 0 6px rgb(45 212 191 / 0.8));
+    }
+    @keyframes scan {
+        from { transform: translateY(0); }
+        to { transform: translateY(156px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .scan-line { animation: none; transform: translateY(78px); }
+    }
+    .tool-card {
+        @apply flex flex-col overflow-hidden rounded-2xl border border-ink-200 bg-white transition
+            hover:-translate-y-0.5 hover:border-lamp-500 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-lamp-500
+            dark:border-ink-800 dark:bg-ink-900 dark:hover:border-lamp-400;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .tool-card { @apply hover:translate-y-0; }
+    }
+    .tool-card-art {
+        @apply flex h-28 items-center justify-center border-b border-ink-100 bg-ink-50 dark:border-ink-800 dark:bg-ink-950/40;
+    }
+
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-lamp-500 disabled:cursor-not-allowed disabled:opacity-50;
+    }
+    .btn-primary {
+        @apply bg-lamp-600 font-semibold text-white shadow-sm hover:bg-lamp-700 active:brightness-95
+            focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-ink-950;
+    }
+    .btn-ghost {
+        @apply border border-ink-200 bg-white text-ink-700 hover:bg-ink-100
+            dark:border-ink-700 dark:bg-ink-900 dark:text-ink-200 dark:hover:bg-ink-800;
+    }
+    .panel {
+        @apply rounded-xl border border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900;
+    }
+    .label {
+        @apply text-xs font-semibold uppercase tracking-wider text-ink-500 dark:text-ink-400;
+    }
+    .hint {
+        @apply text-xs text-ink-500 dark:text-ink-400;
+    }
+
+    /* Control segmentado: <div class="seg"><label class="seg-option"><input type="radio" class="sr-only"><span>…</span></label></div> */
+    .seg {
+        @apply flex flex-wrap gap-1 rounded-lg bg-ink-100 p-1 dark:bg-ink-800;
+    }
+    .seg-option {
+        @apply flex-1 cursor-pointer select-none whitespace-nowrap rounded-md px-3 py-1.5 text-center text-sm font-medium
+            text-ink-600 transition hover:text-ink-900 dark:text-ink-300 dark:hover:text-white;
+    }
+    .seg-option:has(input:checked) {
+        @apply bg-white text-ink-900 shadow-sm dark:bg-ink-950 dark:text-white;
+    }
+    .seg-option:has(input:focus-visible) {
+        @apply ring-2 ring-lamp-500;
+    }
+    .seg-option:has(input:disabled) {
+        @apply cursor-not-allowed opacity-50;
+    }
+
+    .field {
+        @apply w-full rounded-md border border-ink-200 bg-white px-3 py-2 text-sm
+            focus:border-lamp-500 focus:outline-none focus:ring-1 focus:ring-lamp-500
+            dark:border-ink-700 dark:bg-ink-950;
+    }
+
+    /* Capa de texto invisible sobre la vista previa: se puede seleccionar y copiar, como en el PDF. */
+    .text-layer {
+        @apply absolute inset-0 overflow-hidden;
+        line-height: 1;
+    }
+    .text-layer span {
+        position: absolute;
+        color: transparent;
+        white-space: pre;
+        transform-origin: 0 0;
+        cursor: text;
+        font-family: Arial, "Liberation Sans", Helvetica, sans-serif;
+    }
+    .text-layer ::selection {
+        background: rgb(20 184 166 / 0.35);
+    }
+
+    /* Hoja de la vista previa: el tamaño de todo lo de adentro se expresa en cqw. */
+    .sheet {
+        @apply relative w-full overflow-hidden bg-paper;
+        container-type: inline-size;
+    }
+
+    /* Marco de la hoja sobre el fondo de la vista previa: sombra que la despega del fondo en ambos temas. */
+    .sheet-frame,
+    .sheet {
+        box-shadow:
+            0 0 0 1px rgb(var(--sheet-edge)),
+            0 10px 15px -3px rgb(0 0 0 / 0.1),
+            0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --sheet-edge: 210 218 225;
+    }
+    [data-theme='dark'] .sheet-frame,
+    [data-theme='dark'] .sheet {
+        /* En oscuro una sombra negra apenas se nota: se usa más profunda y un halo claro tenue alrededor. */
+        box-shadow:
+            0 0 0 1px rgb(255 255 255 / 0.12),
+            0 18px 40px -6px rgb(0 0 0 / 0.75),
+            0 6px 12px -4px rgb(0 0 0 / 0.6),
+            0 0 48px 2px rgb(255 255 255 / 0.06);
+    }
+}

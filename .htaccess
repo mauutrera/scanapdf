@@ -1,0 +1,38 @@
+# Apache: todo entra por index.php excepto los archivos de /assets.
+# Funciona en la raíz del dominio o en un subdirectorio (no usa RewriteBase).
+
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Archivos estáticos: se sirven tal cual (si no existen, 404 de Apache).
+    RewriteRule ^assets/ - [L]
+
+    # Ya reescrito a index.php: no volver a procesar.
+    RewriteRule ^index\.php$ - [L]
+
+    # Todo lo demás (rutas de la app, y también app/, views/, README, package.json…) va al router,
+    # que responde 404 a lo que no sea una ruta: la estructura de carpetas nunca se expone.
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# Tipos MIME que algunos servidores no traen.
+<IfModule mod_mime.c>
+    AddType text/javascript .js .mjs
+    AddType image/svg+xml .svg
+    AddType application/manifest+json .webmanifest
+</IfModule>
+
+# Caché: los módulos JS se importan entre sí sin "?v=", así que JS y CSS se revalidan siempre
+# (responden 304 si no cambiaron). Las imágenes pueden guardarse más tiempo.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(js|mjs|css)$">
+        Header set Cache-Control "no-cache"
+    </FilesMatch>
+    <FilesMatch "\.(png|svg)$">
+        Header set Cache-Control "public, max-age=604800"
+    </FilesMatch>
+    Header always set X-Content-Type-Options "nosniff"
+</IfModule>

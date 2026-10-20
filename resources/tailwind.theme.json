@@ -1,0 +1,14 @@
+{
+  "fontFamily": {
+    "sans": ["Figtree", "system-ui", "sans-serif"],
+    "mono": ["\"IBM Plex Mono\"", "ui-monospace", "monospace"]
+  },
+  "colors": {
+    "ink": {
+      "50": "#f5f7f8", "100": "#e8edf0", "200": "#d0d9df", "300": "#adbac3", "400": "#8595a1",
+      "500": "#5f707d", "600": "#4a5a66", "700": "#33414b", "800": "#222c33", "900": "#151c21", "950": "#0d1216"
+    },
+    "lamp": { "300": "#5eead4", "400": "#2dd4bf", "500": "#14b8a6", "600": "#0d9488", "700": "#0f766e" },
+    "paper": "#fbfaf6"
+  }
+}

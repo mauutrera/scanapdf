@@ -1,0 +1,14 @@
+{
+  "name": "scanapdf",
+  "private": true,
+  "type": "module",
+  "description": "Herramientas de desarrollo: compilar el CSS (Tailwind) y pruebas. La app no usa Node en producción.",
+  "scripts": {
+    "build:css": "tailwindcss -i resources/css/app.css -o assets/css/app.css --minify",
+    "watch:css": "tailwindcss -i resources/css/app.css -o assets/css/app.css --watch",
+    "test": "node --test tests/*.test.js"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}
